@@ -1,0 +1,102 @@
+/* Fullscreen overlay */
+.help-page-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.15); /* light backdrop */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Floating card */
+.help-page {
+  background-color: #ffffff;
+  max-width: 700px;
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+  padding: 32px 24px;
+  position: relative;
+  overflow-y: auto;
+  max-height: 90vh;
+  font-family: "Segoe UI", Roboto, sans-serif;
+  color: #333;
+}
+
+.help-header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.back-button {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #0077ff;
+  cursor: pointer;
+}
+
+.back-button:hover {
+  text-decoration: underline;
+}
+
+.help-header h1 {
+  margin: 0;
+  font-size: 28px;
+  color: #222;
+}
+
+.subtitle {
+  font-size: 15px;
+  color: #666;
+  margin-top: 8px;
+}
+
+.help-content section {
+  margin-bottom: 28px;
+}
+
+.help-content h2 {
+  font-size: 18px;
+  color: #1a1a1a;
+  margin-bottom: 8px;
+}
+
+.help-content p {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.6;
+}
+
+.help-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-content li {
+  background: #f9f9f9;
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-left: 4px solid #0077ff;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.help-content a {
+  color: #0077ff;
+  text-decoration: none;
+}
+
+.help-content a:hover {
+  text-decoration: underline;
+}

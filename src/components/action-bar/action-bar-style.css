@@ -1,0 +1,93 @@
+/* Horizontal Toolbar Base */
+.actionBar.horizontal {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background: #ffffff;
+  padding: 8px 12px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  position: relative;
+  gap: 10px;
+}
+
+/* Each Tool Button */
+.inputWrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  font-size: 18px;
+  color: #3b3b3b;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+/* Selected Tool Style (Blue Theme) */
+.inputWrapper.selected {
+  background-color: #d0e8ff;
+  color: #007bff;
+}
+
+/* Hover Style */
+.inputWrapper:hover {
+  background-color: #e9f4ff;
+}
+
+/* Shortcut Key Label */
+.toolKey {
+  font-size: 10px;
+  color: #999;
+  margin-top: 2px;
+}
+
+/* Toggle for More Dropdown */
+.dropdownToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* DROPDOWN - Anchored to the icon only */
+.dropdownMenu.below {
+  position: absolute;
+  top: calc(100% + 6px); /* directly below the icon */
+  left: 0;
+  background: #ffffff;
+  border: 1px solid #cce4ff;
+  border-radius: 8px;
+  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.15);
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  z-index: 1000;
+}
+
+/* INDIVIDUAL ITEM INSIDE DROPDOWN */
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 14px;
+  color: #333;
+  border-left: 3px solid transparent;
+}
+
+/* Hover Effect on Dropdown Item */
+.dropdownItem:hover {
+  background-color: #f0f8ff;
+  border-left: 3px solid #007bff;
+}
+
+/* Text beside icon */
+.dropdownLabel {
+  flex-grow: 1;
+  color: #1a1a1a;
+}

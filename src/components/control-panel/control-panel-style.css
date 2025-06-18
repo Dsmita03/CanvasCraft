@@ -1,0 +1,67 @@
+.controlPanelWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
+
+.controlPanel {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(200, 200, 200, 0.3);
+  border-radius: 12px;
+  padding: 8px 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.zoomPanel,
+.editPanel {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+button {
+  all: unset;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 18px;
+  color: #111827;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+  transform: scale(1.1);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+button:focus {
+  outline: 2px solid #60a5fa;
+  outline-offset: 2px;
+}
+
+button[aria-label="Reset Zoom"] {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  color: #1e293b;
+  background-color: rgba(240, 240, 240, 0.8);
+  border-radius: 8px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+button[aria-label="Reset Zoom"]:hover {
+  background-color: rgba(220, 220, 220, 0.9);
+}
