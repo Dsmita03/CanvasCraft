@@ -451,7 +451,7 @@ export default function App() {
       <div className="toolbar-floating">
         <ActionBar tool={tool} setTool={setTool} />
         <button className="theme-toggle" onClick={() => setDarkMode((d) => !d)}>
-          {darkMode ? "🌞" : "🌙"}
+          {darkMode ? "🌙" : "🌞"}
         </button>
       </div>
 
