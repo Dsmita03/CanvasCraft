@@ -1,16 +1,37 @@
 <!doctype html>
-<html lang="en" data-theme="light"> <!-- default fallback -->
+<html lang="en" data-theme="light"> <!-- Default theme -->
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/cube-dots-solid.svg" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>CanvasCraft</title>
+    <meta name="description" content="CanvasCraft – A beautiful freehand drawing & sketching canvas." />
+
+    <link rel="icon" href="/cube-dots-solid.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#3b82f6" />
+
+    <!-- Fonts (Optional: preload or import Inter, etc.) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+
     <script>
-      // Immediately set the theme before React renders
-      const storedTheme = localStorage.getItem("freehandx-theme");
-      if (storedTheme === "dark" || storedTheme === "light") {
-        document.documentElement.setAttribute("data-theme", storedTheme);
-      }
+      // Apply theme before React mounts
+      (function () {
+        try {
+          const theme = localStorage.getItem("freehandx-theme");
+          if (theme === "dark" || theme === "light") {
+            document.documentElement.setAttribute("data-theme", theme);
+          } else {
+            const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+            document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+          }
+        } catch (e) {
+          console.warn("Theme preference read error:", e);
+        }
+      })();
     </script>
   </head>
   <body>

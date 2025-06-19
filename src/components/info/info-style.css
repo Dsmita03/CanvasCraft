@@ -118,3 +118,16 @@ code {
   font-family: "JetBrains Mono", monospace;
   color: #334155;
 }
+
+/* Improve dialog stacking and animation */
+.MuiDialog-paper.infoDialogPaper {
+  z-index: 1300; /* stays on top */
+  animation: fadeIn 0.3s ease-out;
+  backdrop-filter: blur(8px);
+}
+
+/* Prevent focus ring clipping on close button */
+.infoDialogClose:focus {
+  outline: 2px solid var(--accent, #3b82f6);
+  outline-offset: 2px;
+}

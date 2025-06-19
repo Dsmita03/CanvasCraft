@@ -1,3 +1,4 @@
+// Imports
 import {
   MouseEvent,
   useEffect,
@@ -7,9 +8,15 @@ import {
   FocusEvent,
 } from "react";
 import rough from "roughjs";
-import Sidebar from "./components/sidebar/Sidebar";
+
+import { useIsMobile } from "./hooks/useIsMobile";
 import { useHistory } from "./hooks/useHistory";
 import { usePressedKeys } from "./hooks/usePressedKeys";
+
+import Sidebar from "./components/sidebar/Sidebar";
+import HelpPage from "./components/HelpPage/HelpPage";
+import { ActionBar, ControlPanel, Info } from "./components";
+
 import {
   ToolsType,
   ActionsType,
@@ -19,7 +26,7 @@ import {
   ExtendedElementType,
   Tools,
 } from "./types";
-import { ActionBar, ControlPanel, Info } from "./components";
+
 import {
   adjustElementCoordinates,
   adjustmentRequired,
@@ -29,68 +36,41 @@ import {
   getElementAtPosition,
   resizedCoordinates,
 } from "./utilities";
-import HelpPage from "./components/HelpPage/HelpPage";
+
 import "./App.css";
 
+// Constants
 const MIN_ZOOM = 0.1;
 const MAX_ZOOM = 4;
 
+// Component
 export default function App() {
-  const initialTool: ToolsType = Tools.selection;
+  const isMobile = useIsMobile();
   const { elements, setElements, undo, redo } = useHistory([]);
-  const [tool, setTool] = useState<ToolsType>(initialTool);
+
+  const [tool, setTool] = useState<ToolsType>(Tools.selection);
   const [action, setAction] = useState<ActionsType>("none");
   const [selectedElement, setSelectedElement] = useState<SelectedElementType | null>(null);
+
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [startPan, setStartPan] = useState({ x: 0, y: 0 });
   const [scale, setScale] = useState(1);
   const [scaleOffset, setScaleOffset] = useState({ x: 0, y: 0 });
-  const [startPan, setStartPan] = useState({ x: 0, y: 0 });
-  const textRef = useRef<HTMLTextAreaElement>(null);
-  const pressed = usePressedKeys();
+
   const [darkMode, setDarkMode] = useState(false);
-  const [textValue, setTextValue] = useState("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+  const [textValue, setTextValue] = useState("");
+  const textRef = useRef<HTMLTextAreaElement>(null);
+  const pressed = usePressedKeys();
 
-  const handleOpenFile = () => {
-    alert("File open feature not implemented yet.");
-  };
+  const [laserPoints, setLaserPoints] = useState<{ x: number; y: number }[]>([]);
 
-  const handleSaveFile = () => {
-    const data = JSON.stringify(elements);
-    const blob = new Blob([data], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "canvas.json";
-    a.click();
-  };
-
-  const handleExportImage = () => {
-    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    const link = document.createElement("a");
-    link.download = "drawing.png";
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-  };
-
-  const handleResetCanvas = () => {
-    setElements([], true);
-  };
-
-  const handleThemeChange = (value: string) => {
-    setDarkMode(value === "dark");
-  };
-
-  const setCanvasBg = (color: string) => {
-    document.documentElement.style.setProperty("--canvas-bg", color);
-  };
-
+  // Theme setup
   useEffect(() => {
-    const stored = localStorage.getItem("freehandx-theme");
-    if (stored) setDarkMode(stored === "dark");
+    const storedTheme = localStorage.getItem("freehandx-theme");
+    if (storedTheme) setDarkMode(storedTheme === "dark");
   }, []);
 
   useEffect(() => {
@@ -98,6 +78,7 @@ export default function App() {
     localStorage.setItem("freehandx-theme", darkMode ? "dark" : "light");
   }, [darkMode]);
 
+  // Canvas drawing
   useLayoutEffect(() => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement | null;
     if (!canvas) return;
@@ -109,7 +90,8 @@ export default function App() {
     if (!ctx) return;
 
     const roughCanvas = rough.canvas(canvas);
-    const bg = getComputedStyle(document.documentElement).getPropertyValue('--canvas-bg').trim();
+    const bg = getComputedStyle(document.documentElement).getPropertyValue("--canvas-bg").trim();
+
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -117,6 +99,7 @@ export default function App() {
     const sh = canvas.height * scale;
     const sx = (sw - canvas.width) / 2;
     const sy = (sh - canvas.height) / 2;
+
     setScaleOffset({ x: sx, y: sy });
 
     ctx.save();
@@ -129,9 +112,22 @@ export default function App() {
       }
     });
 
-    ctx.restore();
-  }, [elements, action, selectedElement, panOffset, scale]);
+    // Draw laser stroke
+    if (tool === Tools.laser && laserPoints.length > 1) {
+      ctx.strokeStyle = "rgba(255, 0, 0, 0.7)";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(laserPoints[0].x, laserPoints[0].y);
+      for (let i = 1; i < laserPoints.length; i++) {
+        ctx.lineTo(laserPoints[i].x, laserPoints[i].y);
+      }
+      ctx.stroke();
+    }
 
+    ctx.restore();
+  }, [elements, action, selectedElement, panOffset, scale, tool, laserPoints]);
+
+  // Keyboard shortcuts
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && document.activeElement?.tagName !== "TEXTAREA") {
@@ -143,6 +139,7 @@ export default function App() {
     return () => document.removeEventListener("keydown", onKey);
   }, [undo, redo]);
 
+  // Scroll / Zoom
   useEffect(() => {
     const onWheel = (e: WheelEvent) => {
       if (pressed.has("Control") || pressed.has("Meta")) {
@@ -162,6 +159,39 @@ export default function App() {
       setTimeout(() => textRef.current?.focus(), 0);
     }
   }, [action, selectedElement]);
+
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+  const handleThemeChange = (value: string) => setDarkMode(value === "dark");
+
+  const setCanvasBg = (color: string) => {
+    document.documentElement.style.setProperty("--canvas-bg", color);
+  };
+
+  const handleOpenFile = () => alert("File open feature not implemented yet.");
+
+  const handleSaveFile = () => {
+    const data = JSON.stringify(elements);
+    const blob = new Blob([data], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "canvas.json";
+    a.click();
+  };
+
+  const handleExportImage = () => {
+    const canvas = document.getElementById("canvas") as HTMLCanvasElement;
+    const link = document.createElement("a");
+    link.download = "drawing.png";
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  };
+
+  const handleResetCanvas = () => setElements([], true);
+
+  const zoom = (delta: number) => {
+    setScale((prev) => Math.min(Math.max(prev + delta, MIN_ZOOM), MAX_ZOOM));
+  };
 
   const getCoors = (e: MouseEvent<HTMLCanvasElement>) => ({
     clientX: (e.clientX - panOffset.x * scale + scaleOffset.x) / scale,
@@ -200,6 +230,7 @@ export default function App() {
 
   const handleMouseDown = (e: MouseEvent<HTMLCanvasElement>) => {
     if (action === "writing") return;
+
     const { clientX, clientY } = getCoors(e);
 
     if (tool === Tools.eraser) {
@@ -233,16 +264,30 @@ export default function App() {
       }
     }
 
+    if (tool === Tools.laser) {
+      setLaserPoints([{ x: clientX, y: clientY }]);
+      return;
+    }
+
     const id = elements.length;
     const color = getComputedStyle(document.documentElement).getPropertyValue("--fg").trim();
-    const el = createElement(id, clientX, clientY, clientX, clientY, tool, color);
-    setElements((p) => [...p, el]);
-    setSelectedElement(el);
+    const newEl = createElement(id, clientX, clientY, clientX, clientY, tool, color);
+
+    setElements((prev) => [...prev, newEl]);
+    setSelectedElement(newEl);
     setAction(tool === Tools.text ? "writing" : "drawing");
   };
 
   const handleMouseMove = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getCoors(e);
+
+    if (tool === Tools.laser && e.buttons === 1) {
+      setLaserPoints((prev) => {
+        const updated = [...prev, { x: clientX, y: clientY }];
+        return updated.slice(-100);
+      });
+      return;
+    }
 
     if (tool === Tools.eraser && e.buttons === 1) {
       const el = getElementAtPosition(clientX, clientY, elements);
@@ -309,6 +354,11 @@ export default function App() {
   const handleMouseUp = (e: MouseEvent<HTMLCanvasElement>) => {
     const { clientX, clientY } = getCoors(e);
 
+    if (tool === Tools.laser) {
+      setTimeout(() => setLaserPoints([]), 300);
+      return;
+    }
+
     if (selectedElement) {
       const el = elements[selectedElement.id];
       if ((action === "drawing" || action === "resizing") && adjustmentRequired(el.type)) {
@@ -343,9 +393,14 @@ export default function App() {
     }
   };
 
-  const zoom = (delta: number) => {
-    setScale((prev) => Math.min(Math.max(prev + delta, MIN_ZOOM), MAX_ZOOM));
-  };
+  if (isMobile) {
+    return (
+      <div className="mobile-warning">
+        <h2>CanvasCraft is not available on mobile devices</h2>
+        <p>Please use a desktop or laptop for the best experience.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="excalidraw-container">
@@ -362,13 +417,33 @@ export default function App() {
         showHelpPage={() => setShowHelp(true)}
       />
 
-
- {showHelp ? (
+      {showHelp ? (
         <HelpPage onBack={() => setShowHelp(false)} />
       ) : (
-        <main>{/* your normal canvas / editor here */}</main>
+        <main className="canvas-wrapper" style={{ marginLeft: sidebarOpen ? 220 : 0 }}>
+          <canvas
+            id="canvas"
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+          />
+          {action === "writing" && selectedElement?.type === Tools.text && (
+            <textarea
+              ref={textRef}
+              className="drawing-textarea"
+              value={textValue}
+              onChange={(e) => setTextValue(e.target.value)}
+              onBlur={handleBlur}
+              style={{
+                top: selectedElement.y1,
+                left: selectedElement.x1,
+                position: "absolute",
+              }}
+            />
+          )}
+        </main>
       )}
-  
+
       <button className="sidebar-toggle-btn" onClick={toggleSidebar}>
         {sidebarOpen ? "✖" : "☰"}
       </button>
@@ -387,29 +462,6 @@ export default function App() {
       <div className="bottom-left-controls">
         <ControlPanel undo={undo} redo={redo} onZoom={zoom} scale={scale} setScale={setScale} />
       </div>
-
-      <main className="canvas-wrapper" style={{ marginLeft: sidebarOpen ? 220 : 0 }}>
-        <canvas
-          id="canvas"
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-        />
-        {action === "writing" && selectedElement?.type === Tools.text && (
-          <textarea
-            ref={textRef}
-            className="drawing-textarea"
-            value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
-            onBlur={handleBlur}
-            style={{
-              top: selectedElement.y1,
-              left: selectedElement.x1,
-              position: "absolute",
-            }}
-          />
-        )}
-      </main>
     </div>
   );
 }

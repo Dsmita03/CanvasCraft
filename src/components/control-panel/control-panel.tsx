@@ -11,7 +11,7 @@ import {
 type ControlPanelProps = {
   undo: () => void;
   redo: () => void;
-  onZoom: (scale: number) => void;
+  onZoom: (scaleDelta: number) => void;
   scale: number;
   setScale: (scale: number) => void;
 };
@@ -30,50 +30,63 @@ export function ControlPanel({
   return (
     <div className="controlPanelWrapper">
       <div className="controlPanel" role="toolbar" aria-label="Canvas Controls">
+
+        {/* Zoom Controls */}
         <div className="zoomPanel">
           <button
+            type="button"
+            aria-label="Zoom Out"
             data-tooltip-id="canvas-tooltip"
             data-tooltip-content="Zoom Out"
-            aria-label="Zoom Out"
             onClick={() => onZoom(-0.1)}
+            className="controlBtn"
           >
             <PiMinus />
           </button>
 
           <button
+            type="button"
+            aria-label="Reset Zoom"
             data-tooltip-id="canvas-tooltip"
             data-tooltip-content="Reset Zoom to 100%"
-            aria-label="Reset Zoom"
             onClick={() => setScale(1)}
+            className="controlBtn"
           >
             {scalePercent}
           </button>
 
           <button
+            type="button"
+            aria-label="Zoom In"
             data-tooltip-id="canvas-tooltip"
             data-tooltip-content="Zoom In"
-            aria-label="Zoom In"
             onClick={() => onZoom(0.1)}
+            className="controlBtn"
           >
             <PiPlus />
           </button>
         </div>
 
+        {/* Undo/Redo Controls */}
         <div className="editPanel">
           <button
+            type="button"
+            aria-label="Undo"
             data-tooltip-id="canvas-tooltip"
             data-tooltip-content="Undo"
-            aria-label="Undo"
             onClick={undo}
+            className="controlBtn"
           >
             <HiOutlineArrowUturnLeft />
           </button>
 
           <button
+            type="button"
+            aria-label="Redo"
             data-tooltip-id="canvas-tooltip"
             data-tooltip-content="Redo"
-            aria-label="Redo"
             onClick={redo}
+            className="controlBtn"
           >
             <HiOutlineArrowUturnRight />
           </button>
@@ -81,7 +94,7 @@ export function ControlPanel({
       </div>
 
       {/* Shared tooltip for all buttons */}
-      <Tooltip id="canvas-tooltip" />
+      <Tooltip id="canvas-tooltip" place="top" offset={10} delayShow={200} />
     </div>
   );
 }

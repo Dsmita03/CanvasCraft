@@ -1,93 +1,121 @@
-/* Horizontal Toolbar Base */
+/* Toolbar Container */
 .actionBar.horizontal {
   display: flex;
   flex-direction: row;
   align-items: center;
-  background: #ffffff;
-  padding: 8px 12px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  background: var(--panel);
+  padding: 10px 16px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px var(--panel-shadow);
   position: relative;
-  gap: 10px;
+  gap: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: background 0.3s ease, box-shadow 0.3s ease, border 0.3s ease;
 }
 
-/* Each Tool Button */
+/* Individual Tool Button */
 .inputWrapper {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 6px;
-  border-radius: 6px;
-  font-size: 18px;
-  color: #3b3b3b;
-  transition: background 0.2s ease, color 0.2s ease;
+  padding: 8px;
+  border-radius: 10px;
+  font-size: 1.35rem;
+  color: var(--fg);
+  transition: background 0.25s ease, color 0.25s ease, transform 0.15s ease;
+  outline: none;
+  user-select: none;
 }
 
-/* Selected Tool Style (Blue Theme) */
-.inputWrapper.selected {
-  background-color: #d0e8ff;
-  color: #007bff;
-}
-
-/* Hover Style */
 .inputWrapper:hover {
-  background-color: #e9f4ff;
+  background-color: rgba(59, 130, 246, 0.12);
+  color: var(--highlight);
+  transform: scale(1.05);
 }
 
-/* Shortcut Key Label */
+.inputWrapper:focus-visible {
+  box-shadow: 0 0 0 2px var(--highlight);
+}
+
+/* Selected Tool */
+.inputWrapper.selected {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Keyboard Shortcut Label */
 .toolKey {
-  font-size: 10px;
-  color: #999;
-  margin-top: 2px;
+  font-size: 11px;
+  color: var(--fg);
+  opacity: 0.6;
+  margin-top: 3px;
 }
 
-/* Toggle for More Dropdown */
+/* Dropdown Toggle Button */
 .dropdownToggle {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* DROPDOWN - Anchored to the icon only */
+/* Dropdown Menu (More Tools) */
 .dropdownMenu.below {
   position: absolute;
-  top: calc(100% + 6px); /* directly below the icon */
+  top: calc(100% + 10px);
   left: 0;
-  background: #ffffff;
-  border: 1px solid #cce4ff;
-  border-radius: 8px;
-  box-shadow: 0 6px 16px rgba(0, 123, 255, 0.15);
+  background: var(--panel);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
   padding: 6px 0;
   display: flex;
   flex-direction: column;
-  min-width: 160px;
+  min-width: 190px;
   z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
 }
 
-/* INDIVIDUAL ITEM INSIDE DROPDOWN */
+/* Dropdown Items */
 .dropdownItem {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
+  gap: 12px;
+  padding: 10px 16px;
   cursor: pointer;
-  transition: background 0.2s ease;
-  font-size: 14px;
-  color: #333;
+  font-size: 0.95rem;
+  color: var(--fg);
   border-left: 3px solid transparent;
+  transition: background 0.2s ease, border-left 0.2s ease, transform 0.15s ease;
 }
 
-/* Hover Effect on Dropdown Item */
-.dropdownItem:hover {
-  background-color: #f0f8ff;
-  border-left: 3px solid #007bff;
+.dropdownItem:hover,
+.dropdownItem:focus {
+  background-color: rgba(96, 165, 250, 0.12);
+  border-left: 3px solid var(--highlight);
+  transform: translateX(2px);
+  outline: none;
 }
 
-/* Text beside icon */
+/* Label in Dropdown */
 .dropdownLabel {
   flex-grow: 1;
-  color: #1a1a1a;
+  color: var(--fg);
+  opacity: 0.9;
+  font-weight: 500;
+}
+
+/* Smooth fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }

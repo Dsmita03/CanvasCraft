@@ -2,7 +2,7 @@
   --bg: #fefefe;
   --fg: #212121;
   --panel: #ffffff;
-  --panel-shadow: rgba(0, 0, 0, 0.06);
+  --panel-shadow: rgba(0, 0, 0, 0.08);
   --highlight: #3b82f6;
   --accent: #6366f1;
   --canvas-bg: #ffffff;
@@ -11,8 +11,8 @@
 :root[data-theme="dark"] {
   --bg: #121212;
   --fg: #f4f4f5;
-  --panel: #1f1f23;
-  --panel-shadow: rgba(0, 0, 0, 0.3);
+  --panel: #1e1e22;
+  --panel-shadow: rgba(0, 0, 0, 0.4);
   --highlight: #60a5fa;
   --accent: #a78bfa;
   --canvas-bg: #2a2a2a;
@@ -28,23 +28,19 @@ body,
   background-color: var(--bg);
   color: var(--fg);
   transition: background-color 0.3s ease, color 0.3s ease;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
-.excalidraw-container {
+.excalidraw-container,
+.canvas-wrapper {
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
 }
 
-/* Canvas wrapper */
-.canvas-wrapper {
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* Canvas itself */
+/* Canvas */
 canvas {
   display: block;
   width: 100%;
@@ -54,7 +50,7 @@ canvas {
   touch-action: none;
 }
 
-/* Floating text input for text tool */
+/* Floating Text Tool */
 .drawing-textarea {
   position: absolute;
   background: transparent;
@@ -66,44 +62,48 @@ canvas {
   line-height: 1.5;
   font-family: inherit;
   z-index: 10;
-  padding: 2px;
-  min-width: 2ch;
+  padding: 4px 6px;
+  min-width: 3ch;
   overflow: hidden;
+  border-radius: 6px;
+  background-color: rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(3px);
 }
 
-/* Toolbar container */
+/* Floating Toolbar */
 .toolbar-floating {
   position: absolute;
   top: 1rem;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
-  gap: 12px;
+  gap: 14px;
   background-color: var(--panel);
   padding: 10px 18px;
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: 0 6px 12px var(--panel-shadow);
   align-items: center;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Theme toggle button (moon/sun icon) */
+/* Theme Toggle */
 .theme-toggle {
   background: none;
   border: none;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   cursor: pointer;
   color: var(--fg);
-  transition: color 0.2s ease;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .theme-toggle:hover {
   color: var(--highlight);
+  transform: scale(1.1);
 }
 
-/* Bottom-left control panel (zoom, undo, redo) */
+/* Bottom Controls (Undo, Redo, Zoom) */
 .bottom-left-controls {
   position: absolute;
   bottom: 1.2rem;
@@ -113,29 +113,63 @@ canvas {
   gap: 10px;
 }
 
-/* Menu button (if used) */
+/* Menu Button */
 .menu-button {
   position: absolute;
   top: 1rem;
   left: 1rem;
   background: var(--panel);
   border: none;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: 10px;
   font-size: 1.1rem;
   color: var(--fg);
   box-shadow: 0 4px 10px var(--panel-shadow);
   cursor: pointer;
-  transition: background 0.25s ease;
+  transition: background 0.25s ease, color 0.25s ease;
 }
 
 .menu-button:hover {
   background: var(--highlight);
-  color: white;
+  color: #ffffff;
 }
+
+/* Floating Info Button */
 .info-floating-button {
   position: fixed;
   bottom: 24px;
   right: 24px;
   z-index: 1000;
+  background-color: var(--panel);
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 4px 12px var(--panel-shadow);
+  transition: background 0.3s ease;
+}
+
+.info-floating-button:hover {
+  background-color: var(--highlight);
+  color: white;
+}
+
+/* Mobile Warning Fallback */
+.mobile-warning {
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  background-color: #111;
+  color: #fff;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.25rem;
+  line-height: 1.6;
+}
+
+.mobile-warning h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: var(--highlight);
 }

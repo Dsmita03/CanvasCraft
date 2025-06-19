@@ -1,16 +1,22 @@
 import { nearPoint } from ".";
 import { ElementType, Tools } from "../types";
 
-type PointType = {
-  x: number;
-  y: number;
-};
+type Point = { x: number; y: number };
+type Position =
+  | "start"
+  | "end"
+  | "topLeft"
+  | "topRight"
+  | "bottomLeft"
+  | "bottomRight"
+  | "inside"
+  | null;
 
 export const getElementAtPosition = (
   x: number,
   y: number,
   elements: ElementType[]
-) => {
+): (ElementType & { position: Position }) | undefined => {
   return elements
     .map((element) => ({
       ...element,
@@ -19,37 +25,49 @@ export const getElementAtPosition = (
     .find((element) => element.position !== null);
 };
 
-const positionWithinElement = (x: number, y: number, element: ElementType) => {
+const positionWithinElement = (
+  x: number,
+  y: number,
+  element: ElementType
+): Position => {
   const { type, x1, x2, y1, y2 } = element;
+
+  const [minX, maxX] = [Math.min(x1, x2), Math.max(x1, x2)];
+  const [minY, maxY] = [Math.min(y1, y2), Math.max(y1, y2)];
+
   switch (type) {
     case Tools.line: {
       const on = onLine(x1, y1, x2, y2, x, y);
-      const start = nearPoint(x, y, x1, y1, "start");
-      const end = nearPoint(x, y, x2, y2, "end");
-      return start || end || on;
+      return (nearPoint(x, y, x1, y1, "start") as Position) ||
+        (nearPoint(x, y, x2, y2, "end") as Position) ||
+        on;
     }
+
     case Tools.rectangle: {
-      const topLeft = nearPoint(x, y, x1, y1, "topLeft");
-      const topRight = nearPoint(x, y, x2, y1, "topRight");
-      const bottomLeft = nearPoint(x, y, x1, y2, "bottomLeft");
-      const bottomRight = nearPoint(x, y, x2, y2, "bottomRight");
-      const inside = x >= x1 && x <= x2 && y >= y1 && y <= y2 ? "inside" : null;
-      return topLeft || topRight || bottomLeft || bottomRight || inside;
+      return (
+        nearPoint(x, y, x1, y1, "topLeft") as Position ||
+        nearPoint(x, y, x2, y1, "topRight") as Position ||
+        nearPoint(x, y, x1, y2, "bottomLeft") as Position ||
+        nearPoint(x, y, x2, y2, "bottomRight") as Position ||
+        (x >= minX && x <= maxX && y >= minY && y <= maxY ? "inside" : null)
+      );
     }
+
     case Tools.pencil: {
-      const betweenAnyPoint = element.points!.some((point, index) => {
-        const nextPoint = element.points![index + 1];
-        if (!nextPoint) return false;
-        return (
-          onLine(point.x, point.y, nextPoint.x, nextPoint.y, x, y, 5) != null
-        );
-      });
-      return betweenAnyPoint ? "inside" : null;
+      const points = element.points || [];
+      for (let i = 0; i < points.length - 1; i++) {
+        if (onLine(points[i].x, points[i].y, points[i + 1].x, points[i + 1].y, x, y, 5)) {
+          return "inside";
+        }
+      }
+      return null;
     }
+
     case Tools.text:
-      return x >= x1 && x <= x2 && y >= y1 && y <= y2 ? "inside" : null;
+      return x >= minX && x <= maxX && y >= minY && y <= maxY ? "inside" : null;
+
     default:
-      throw new Error(`Type not recognised: ${type}`);
+      throw new Error(`Unknown element type: ${type}`);
   }
 };
 
@@ -60,14 +78,19 @@ const onLine = (
   y2: number,
   x: number,
   y: number,
-  maxDistance: number = 1
-): string | null => {
-  const a: PointType = { x: x1, y: y1 };
-  const b: PointType = { x: x2, y: y2 };
-  const c: PointType = { x, y };
-  const offset = distance(a, b) - (distance(a, c) + distance(b, c));
-  return Math.abs(offset) < maxDistance ? "inside" : null;
+  maxDist = 1
+): "inside" | null => {
+  const a: Point = { x: x1, y: y1 };
+  const b: Point = { x: x2, y: y2 };
+  const c: Point = { x, y };
+
+  const lengthAB = distance(a, b);
+  const distanceAC = distance(a, c);
+  const distanceBC = distance(b, c);
+
+  const offset = lengthAB - (distanceAC + distanceBC);
+  return Math.abs(offset) < maxDist ? "inside" : null;
 };
 
-const distance = (a: PointType, b: PointType) =>
-  Math.sqrt(Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2));
+const distance = (a: Point, b: Point): number =>
+  Math.hypot(a.x - b.x, a.y - b.y);
